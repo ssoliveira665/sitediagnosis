@@ -46,14 +46,14 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from .models import School
 from .models import Bairro
 from .models import Disciplina
-
 from .forms import CPFLoginForm
-
 from django.contrib.auth import views as auth_views
-
 from django.core.mail import send_mail
-
 import csv
+
+
+
+
 
 
 
@@ -128,6 +128,7 @@ def cadastro_usuario(request):
         email = request.POST.get('email')
         senha = request.POST.get('senha')
         confirmar_senha = request.POST.get('confirmar_senha')
+        data_nascimento = request.POST.get('data_nascimento')
 
         # Handle CPF duplication error
         if Usuario.objects.filter(cpf=cpf).exists():
@@ -137,22 +138,26 @@ def cadastro_usuario(request):
         if senha != confirmar_senha:
             return render(request, 'error_page.html', {'password_error': "As senhas não coincidem."})
 
-
-        data_nascimento = request.POST.get('data_nascimento')
-
         # Additional fields for Inscricao
-        responsavel_legal = request.POST.get('nome_responsavel')
-        tipo_responsavel = request.POST.get('tipo_responsavel')
+        responsavel_legal = request.POST.get('nome_responsavel')  # Corrigido para corresponder ao nome do campo no HTML
+        tipo_responsavel = request.POST.get('tipo_responsavel')  # Corrigido para corresponder ao nome do campo no HTML
+        cpf_responsavel = request.POST.get('cpf_responsavel')
+        rg_responsavel = request.POST.get('rg_responsavel')
         telefone = request.POST.get('telefone')
         telefone_secundario = request.POST.get('telefone_2')
         endereco = request.POST.get('endereco')
         bairro = request.POST.get('bairro')
+        cidade = request.POST.get('cidade')
         ponto_referencia = request.POST.get('ponto_referencia')
         possui_necessidade_especial = request.POST.get('possui_necessidade_especial')
         tipo_necessidade_especial = request.POST.get('necessidade_especial_detalhe')
         turno_disponivel = request.POST.get('turno_disponivel')
         etapa_pretendida = request.POST.get('etapa_pretendida')
         prova_todas_disciplinas = request.POST.get('prova_todas_disciplinas')
+        fez_exame_supletivo = request.POST.get('fez_exame_supletivo')
+        # Fixing the variable names to match the database columns
+        local_exame = request.POST.get('local_prova')  # This should match the DB field 'local_exame'
+        escola = request.POST.get('escola_2024')  # This should match the DB field 'escola'
 
         # Verifying passwords
         if senha != confirmar_senha:
@@ -180,16 +185,22 @@ def cadastro_usuario(request):
                 candidato=usuario,
                 responsavel_legal=responsavel_legal,
                 tipo_responsavel=tipo_responsavel,
+                cpf_responsavel=cpf_responsavel,
+                rg_responsavel=rg_responsavel,
                 telefone=telefone,
                 telefone_secundario=telefone_secundario,
                 endereco=endereco,
                 bairro=bairro,
+                cidade=cidade,
                 ponto_referencia=ponto_referencia,
                 necessidade_especial=(possui_necessidade_especial == 'Sim'),
                 tipo_necessidade_especial=tipo_necessidade_especial,
                 turno_disponivel=turno_disponivel,
                 etapa_pretendida=etapa_pretendida,
-                prova_todas_disciplinas=prova_todas_disciplinas
+                prova_todas_disciplinas=prova_todas_disciplinas,
+                exame_supletivo=fez_exame_supletivo,
+                local_exame=local_exame,  # Now this matches the database column
+                escola=escola  # Now this matches the database column
             )
 
             # Handle disciplines
@@ -213,6 +224,7 @@ def cadastro_usuario(request):
 
     # Render the registration page if not a POST request
     return render(request, 'cadastro_usuario.html')
+
 #**********************************************************************************************************
 
 @login_required
@@ -246,11 +258,6 @@ def imprimir_inscricao(request, inscricao_id):
 
     # Cabeçalho com logo da secretaria e título centralizado
     logo_path = os.path.join(settings.STATIC_ROOT, 'img', 'logoEsquerda.png')
-
-
-
-
-
 
     if logo_path:
         pdf.drawImage(logo_path, margin, height - 95, width=80, height=80)
@@ -644,3 +651,71 @@ def export_inscricoes_to_csv(request):
 
 class CustomAdminLoginView(LoginView):
     template_name = 'registration/admin_login.html'
+#**********************************************************************************************************
+
+
+@login_required
+def salvar_inscricao(request):
+    if request.method == 'POST':
+        # Obtém os dados do formulário
+        responsavel_legal = request.POST.get('responsavel_legal')
+        tipo_responsavel = request.POST.get('tipo_responsavel')
+        cidade = request.POST.get('cidade')
+        cpf_responsavel = request.POST.get('cpf_responsavel')
+        rg_responsavel = request.POST.get('rg_responsavel')
+
+        # Verifica se o usuário já possui uma inscrição
+        inscricao, created = Inscricao.objects.get_or_create(candidato=request.user)
+
+        # Atualiza os campos com os novos dados
+        inscricao.responsavel_legal = responsavel_legal
+        inscricao.tipo_responsavel = tipo_responsavel
+        inscricao.cidade = cidade
+        inscricao.cpf_responsavel = cpf_responsavel
+        inscricao.rg_responsavel = rg_responsavel
+
+        try:
+            # Salva a inscrição no banco de dados
+            inscricao.save()
+            messages.success(request, 'Inscrição salva com sucesso.')
+            return redirect('area_do_candidato')
+        except ValidationError as e:
+            messages.error(request, f'Erro ao salvar a inscrição: {e}')
+            return render(request, 'formulario_inscricao.html', {'inscricao': inscricao})
+    else:
+        # Se for uma requisição GET, exibe o formulário
+        return render(request, 'formulario_inscricao.html')
+#**********************************************************************************************************   
+
+
+@login_required
+def salvar_inscricao_modal(request):
+    if request.method == 'POST':
+        # Obtendo os dados enviados via POST pelo modal
+        responsavel_legal = request.POST.get('nomeResponsavel')
+        tipo_responsavel = request.POST.get('tipoResponsavel')
+        cidade = request.POST.get('cidade')
+        cpf_responsavel = request.POST.get('cpf_responsavel')
+        rg_responsavel = request.POST.get('rg_responsavel')
+
+        # Verificar se o usuário já possui uma inscrição
+        inscricao, created = Inscricao.objects.get_or_create(candidato=request.user)
+
+        # Atualiza os campos da inscrição com os novos dados
+        inscricao.responsavel_legal = responsavel_legal
+        inscricao.tipo_responsavel = tipo_responsavel
+        inscricao.cidade = cidade
+        inscricao.cpf_responsavel = cpf_responsavel
+        inscricao.rg_responsavel = rg_responsavel
+
+        try:
+            # Salva a inscrição no banco de dados
+            inscricao.save()
+            messages.success(request, 'Dados de inscrição salvos com sucesso.')
+            return redirect('area_do_candidato')  # Redirecionar para a página da área do candidato
+        except ValidationError as e:
+            messages.error(request, f'Ocorreu um erro ao salvar a inscrição: {e}')
+            return render(request, 'area_do_candidato.html', {'inscricao': inscricao})
+    else:
+        # Se não for uma requisição POST, renderiza o modal
+        return render(request, 'area_do_candidato.html')

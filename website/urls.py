@@ -56,6 +56,7 @@ urlpatterns = [
 
     path('accounts/login-admin/', CustomAdminLoginView.as_view(), name='login_admin'),
     path('accounts/login-admin/', CustomAdminLoginView.as_view(), name='admin_login'),  # Add 
+    path('salvar-inscricao/', views.salvar_inscricao_modal, name='salvar_inscricao_modal'),
 
 
 ]
