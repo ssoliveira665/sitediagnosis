@@ -258,7 +258,7 @@
                         <!-- Nome do Responsável legal -->
                         <div class="col-md-4 mb-3">
                             <label for="nomeResponsavel" class="form-label">Nome do Responsável Legal</label>
-                            <input type="text" class="form-control" id="nomeResponsavel" name="nomeResponsavel" disabled>
+                            <input type="text" class="form-control" id="nome_responsavel" name="nome_responsavel" disabled>
                         </div>
                         
                         
@@ -283,7 +283,7 @@
                         <!-- Tipo de Responsável Legal -->
                         <div class="col-md-4 mb-3">
                             <label for="tipoResponsavel" class="form-label">Tipo de Responsável Legal</label>
-                            <select class="form-control" id="tipoResponsavel" name="tipoResponsavel" disabled>
+                            <select class="form-control" id="tipo_responsavel" name="tipo_responsavel" disabled>
                                 <option value="">Selecione</option>
                                 <option value="pai">Pai</option>
                                 <option value="mae">Mãe</option>
@@ -594,11 +594,15 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="termos_condicoes" name="termos_condicoes" required>
                                 <label class="form-check-label" for="termos_condicoes" style="font-weight: bold; color: #90aff0; font-size: 0.8rem; text-align: justify;">
-                                    Eu li e aceito os <strong style="text-decoration: underline;">TERMOS e CONDIÇÕES</strong> deste Edital, 
-                                    incluindo as diretrizes para o exame de Suplência 2024, a data programada para 
+                                    Eu li e aceito os 
+                                    <a href="{% static 'downloads/edital.pdf' %}" target="_blank" style="text-decoration: underline; font-weight: bold;">
+                                        <b>TERMOS e CONDIÇÕES</b>
+                                    </a>
+                                    deste Edital, incluindo as diretrizes para o exame de Suplência 2024, a data programada para 
                                     <strong>1º de dezembro de 2024</strong>, o horário de início às <strong>7h30</strong> e o formato 
                                     <strong>presencial</strong> do exame.
                                 </label>
+                                
                             </div>
                         </div>
                     </div>
@@ -1325,10 +1329,10 @@ window.onload = function() {
             radioNao.disabled = false;
     
             // Habilitar os campos do Responsável Legal
-            document.getElementById('nomeResponsavel').disabled = false;
+            document.getElementById('nome_responsavel').disabled = false;
             document.getElementById('cpf_responsavel').disabled = false;
             document.getElementById('rg_responsavel').disabled = false;
-            document.getElementById('tipoResponsavel').disabled = false;
+            document.getElementById('tipo_responsavel').disabled = false;
     
         } else if (idade >= idadeLimite18) {
             // Se o candidato tiver 18 anos ou mais, marcar "Sim"
@@ -1337,10 +1341,10 @@ window.onload = function() {
             radioNao.disabled = false;
     
             // Desabilitar os campos do Responsável Legal
-            document.getElementById('nomeResponsavel').disabled = true;
+            document.getElementById('nome_responsavel').disabled = true;
             document.getElementById('cpf_responsavel').disabled = true;
             document.getElementById('rg_responsavel').disabled = true;
-            document.getElementById('tipoResponsavel').disabled = true;
+            document.getElementById('tipo_responsavel').disabled = true;
         } else {
             // Se o candidato for menor de 15 anos, desabilitar ambos os radios e o formulário
             radioSim.disabled = true;
