@@ -173,7 +173,7 @@ class Inscricao(models.Model):
 
     prova_todas_disciplinas = models.CharField(
         max_length=3,
-        choices=[('Sim', 'Sim'), ('Não', 'Não')],
+        choices=PROVA_TODAS_DISCIPLINAS_CHOICES,
         default='Não',
         verbose_name="Deseja realizar a prova de todas as disciplinas?"
     )
@@ -213,14 +213,19 @@ class Inscricao(models.Model):
     
     # New Status Field
     STATUS_CHOICES = [
-        ('pending', 'Pendente'),
+        ('inscrito', 'Inscrito'),
         ('approved', 'Aprovado'),
-        ('rejected', 'Rejeitdo(a)'),
+        ('analise', 'Analise'),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Inscrito')
 
     def __str__(self):
         return f"Inscrição de {self.candidato.nome_completo}"
+    
+    @property
+    def formatted_id(self):
+        return str(self.id).zfill(4)  # Isso vai adicionar zeros à esquerda até 4 dígitos
+
 #**********************************************************************************************************
 
 class Candidato(models.Model):

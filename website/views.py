@@ -200,18 +200,20 @@ def cadastro_usuario(request):
                 prova_todas_disciplinas=prova_todas_disciplinas,
                 exame_supletivo=fez_exame_supletivo,
                 local_exame=local_exame,  # Now this matches the database column
-                escola=escola  # Now this matches the database column
+                escola=escola,  # Now this matches the database column
             )
 
-            # Handle disciplines
+            # Handle disciplines based on "prova_todas_disciplinas"
             if prova_todas_disciplinas == 'Sim':
-                # If all disciplines, add all to inscricao
-                all_disciplinas = Disciplina.objects.all()
-                inscricao.disciplinas.set(all_disciplinas)
+                todas_disciplinas = Disciplina.objects.filter(nome__in=[
+                    'Matemática', 'Ciências', 'Arte', 'Educação Física',
+                    'História', 'Geografia', 'Língua Portuguesa', 'Inglês'
+                ])
+                inscricao.disciplinas.set(todas_disciplinas)
             else:
-                # If 'Não', only add selected disciplines
-                selected_disciplinas = request.POST.getlist('disciplinas')
-                inscricao.disciplinas.set(selected_disciplinas)
+                # Adiciona apenas as disciplinas selecionadas pelo usuário
+                disciplinas_selecionadas = request.POST.getlist('disciplinas')
+                inscricao.disciplinas.set(disciplinas_selecionadas)
 
             # Log the user in and redirect to the candidate area
             login(request, usuario)
@@ -719,3 +721,30 @@ def salvar_inscricao_modal(request):
     else:
         # Se não for uma requisição POST, renderiza o modal
         return render(request, 'area_do_candidato.html')
+#**********************************************************************************************************
+
+def editar_inscricao(request, id):
+    inscricao = get_object_or_404(Inscricao, id=id)
+
+    if request.method == 'POST':
+        # Processar o formulário de edição aqui
+        inscricao.nome_completo = request.POST.get('nome_completo')
+        inscricao.cpf = request.POST.get('cpf')
+        inscricao.telefone = request.POST.get('telefone')
+        inscricao.endereco = request.POST.get('endereco')
+        inscricao.prova_todas_disciplinas = request.POST.get('prova_todas_disciplinas')
+        inscricao.save()
+
+        return redirect('area_do_candidato')  # Redirecionar após salvar
+
+    return render(request, 'editar_inscricao.html', {'inscricao': inscricao})
+#**********************************************************************************************************
+
+def visualizar_inscricao(request, id):
+    inscricao = get_object_or_404(Inscricao, id=id)
+    return render(request, 'visualizar_inscricao.html', {'inscricao': inscricao})
+#**********************************************************************************************************
+
+def acompanhar_inscricao(request, id):
+    inscricao = get_object_or_404(Inscricao, id=id)
+    return render(request, 'acompanhar_inscricao.html', {'inscricao': inscricao})
