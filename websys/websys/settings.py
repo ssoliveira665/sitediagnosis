@@ -2,6 +2,23 @@ from pathlib import Path
 import os
 #import environ
 
+# Forçar HTTPS
+SECURE_SSL_REDIRECT = True  # Redireciona automaticamente todo o tráfego HTTP para HTTPS
+
+# Configurar cookies de sessão e CSRF para uso somente em HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000  # 1 ano
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Permitir apenas HTTPS para conexões
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,7 +32,7 @@ SECRET_KEY = 'django-insecure-lzc)l!c$ew3kylcssvcvdr^5^ww9=wp$ivt@&$o6pei+!0$oug
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['15.228.59.223', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['15.228.59.233', 'localhost', '127.0.0.1']
 
 
 

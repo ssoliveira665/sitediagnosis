@@ -1,3 +1,4 @@
 * Deploy da aplicação
 * Ajustes nas configurações do banco de dados
 * Versionando no github
+* Relizado as configurações de http para https 
