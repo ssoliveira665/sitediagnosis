@@ -1,48 +1,35 @@
 from pathlib import Path
 import os
-#import environ
 
-# Forçar HTTPS
-SECURE_SSL_REDIRECT = True  # Redireciona automaticamente todo o tráfego HTTP para HTTPS
+SECURE_SSL_REDIRECT = True  
 
-# Configurar cookies de sessão e CSRF para uso somente em HTTPS
+
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# HSTS (HTTP Strict Transport Security)
+
 SECURE_HSTS_SECONDS = 31536000  # 1 ano
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# Permitir apenas HTTPS para conexões
+
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-lzc)l!c$ew3kylcssvcvdr^5^ww9=wp$ivt@&$o6pei+!0$oug'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
-<<<<<<< HEAD
+
 ALLOWED_HOSTS = ['54.233.92.107', 'localhost', '127.0.0.1']
-=======
-ALLOWED_HOSTS = ['15.228.59.233', 'localhost', '127.0.0.1']
 
-
-
-
->>>>>>> 577a163237996dc6e1c335804d116c09def60c71
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -85,8 +72,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'websys.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -95,21 +80,7 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',  # Use 'mysql' para o backend
-#         'NAME': 'eja2024',
-#         'USER': 'root',
-#         'PASSWORD': '@Drik16091985',
-#         'HOST': 'localhost',   # Ou o IP do servidor MySQL
-#         'PORT': '3306',        # Porta padrão do MySQL
-#     }
-# }
 
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -127,8 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -139,14 +108,12 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
 
-# Diretório onde seus arquivos estáticos estão localizados
+
 STATICFILES_DIRS = [ 
-    BASE_DIR / 'static',  # Ou 'static/' dependendo de como está o BASE_DIR
+    BASE_DIR / 'static', 
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -154,30 +121,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'login'  # URL para onde redireciona se o usuário não estiver autenticado
-LOGIN_REDIRECT_URL = 'area_do_candidato'  # Para onde redireciona após o login bem-sucedido
-LOGOUT_REDIRECT_URL = 'pagina_inicial'  # Para onde redireciona após o logout
+LOGIN_URL = 'login'  
+LOGIN_REDIRECT_URL = 'area_do_candidato'  
+LOGOUT_REDIRECT_URL = 'pagina_inicial'  
 
 # Em settings.py
-AUTH_USER_MODEL = 'website.Usuario'  # Substitua 'app_name' pelo nome do app onde o modelo `Usuario` está definido
+AUTH_USER_MODEL = 'website.Usuario' 
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default backend
-    # Add custom backends if necessary
+    'django.contrib.auth.backends.ModelBackend',  
+    
 ]
 
-
-
-# EMAIL_BACKEND = 'django_ses.SESBackend'
-# AWS_ACCESS_KEY_ID = 'your_aws_access_key'
-# AWS_SECRET_ACCESS_KEY = 'your_aws_secret_key'
-# AWS_SES_REGION_NAME = 'us-east-1'  # or your preferred region
-# AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
 
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORT=587
