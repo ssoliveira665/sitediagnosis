@@ -58,6 +58,8 @@ from .forms import InscricaoSearchForm
 from .forms import InscricaoFilterForm  # Importe o formulário de filtro
 from .forms import InscricaoForm
 
+from django.db import IntegrityError
+
 
 
 
@@ -125,7 +127,7 @@ def verificar_cpf_ajax(request):
 
 def cadastro_usuario(request):
     if request.method == 'POST':
-        # Fetching user fields
+        # Coletando os dados do formulário
         nome_completo = request.POST.get('nome_completo')
         cpf = request.POST.get('cpf')
         email = request.POST.get('email')
@@ -133,15 +135,25 @@ def cadastro_usuario(request):
         confirmar_senha = request.POST.get('confirmar_senha')
         data_nascimento = request.POST.get('data_nascimento')
 
-        # Handle CPF duplication error
+        errors = {}
+
+        # Tratamento para CPF duplicado
         if Usuario.objects.filter(cpf=cpf).exists():
-            return render(request, 'error_page.html', {'cpf_error': f"Este CPF ({cpf}) já está cadastrado."})
+            errors['cpf_error'] = f"Este CPF ({cpf}) já está cadastrado."
 
-        # Handle password mismatch error
+        # Tratamento para email duplicado
+        if Usuario.objects.filter(email=email).exists():
+            errors['email_error'] = f"Este email ({email}) já está cadastrado."
+
+        # Tratamento para senhas que não coincidem
         if senha != confirmar_senha:
-            return render(request, 'error_page.html', {'password_error': "As senhas não coincidem."})
+            errors['password_error'] = "As senhas não coincidem."
 
-        # Additional fields for Inscricao
+        # Se houver erros, retorna a página de erro com todos os detalhes
+        if errors:
+            return render(request, 'error_page.html', errors)
+
+        # Coletando outros campos para Inscricao
         responsavel_legal = request.POST.get('nome_responsavel')  # Corrigido para corresponder ao nome do campo no HTML
         tipo_responsavel = request.POST.get('tipo_responsavel')  # Corrigido para corresponder ao nome do campo no HTML
         cpf_responsavel = request.POST.get('cpf_responsavel')
@@ -223,10 +235,15 @@ def cadastro_usuario(request):
             login(request, usuario)
             return redirect('area_do_candidato')
 
+        except IntegrityError as e:
+            # Tratamento para outros erros do banco de dados
+            errors['db_error'] = "Erro no banco de dados: " + str(e)
+            return render(request, 'error_page.html', errors)
+
         except ValidationError as e:
-            # Handle any validation error (e.g., incorrect data)
-            messages.error(request, str(e))
-            return render(request, 'cadastro_usuario.html')
+            # Tratamento para outros erros de validação
+            errors['validation_error'] = "Erro de validação: " + str(e)
+            return render(request, 'error_page.html', errors)
 
     # Render the registration page if not a POST request
     return render(request, 'cadastro_usuario.html')

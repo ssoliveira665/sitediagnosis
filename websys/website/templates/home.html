@@ -1025,7 +1025,7 @@
                             <p class="mb-0">&copy; 2024 Semed Canaã</p>
                         </div>
                         <div class="col-6 text-end">
-                            <p class="mb-0">&reg; SEPROT - SEMED</p>
+                            <p class="mb-0">&reg; SEPROT - SEMED V3.1</p>
                         </div>
                     </div>
                 </div>
@@ -1482,6 +1482,18 @@ window.onload = function() {
     });
 </script>
 
+{% if messages %}
+    <div class="container">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+</script>
 
 
 
