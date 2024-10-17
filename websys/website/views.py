@@ -102,27 +102,33 @@ def verificar_cpf(request):
     return render(request, 'verificar_cpf.html')  # Página que exibe o modal para inserir CPF
 #**********************************************************************************************************
 
+@require_POST  # Limita a view para aceitar apenas POST
 def verificar_cpf_ajax(request):
-    if request.method == 'POST':
-        cpf = request.POST.get('cpf')
-        print(f"Recebido CPF: {cpf}")  # Log para verificar o CPF
+    cpf = request.POST.get('cpf')
+    print(f"Recebido CPF: {cpf}")  # Log para verificar o CPF
 
-        if not cpf:
-            print("CPF não fornecido ou inválido")
-            return JsonResponse({'status': 'erro', 'message': 'CPF inválido'})
+    # Verifica se o CPF foi enviado corretamente
+    if not cpf:
+        print("CPF não fornecido ou inválido")
+        return JsonResponse({'status': 'erro', 'message': 'CPF não fornecido ou inválido'}, status=400)
 
-        try:
-            # Verifica se o CPF existe no banco de dados
-            usuario = Usuario.objects.get(cpf=cpf)
-            print("CPF encontrado")  # Loga se o CPF foi encontrado
-            return JsonResponse({'status': 'existe'})
-        except Usuario.DoesNotExist:
-            print("CPF não encontrado")  # Loga se o CPF não foi encontrado
-            return JsonResponse({'status': 'nao_existe'})
-    
-    # Loga se o método não for POST
-    print("Método inválido")
-    return JsonResponse({'status': 'erro', 'message': 'Requisição inválida'})
+    try:
+        # Verifica se o CPF existe no banco de dados
+        usuario = Usuario.objects.get(cpf=cpf)
+        print("CPF encontrado")  # Loga se o CPF foi encontrado
+        return JsonResponse({'status': 'existe'})
+
+    except Usuario.DoesNotExist:
+        # Caso o CPF não seja encontrado
+        print("CPF não encontrado")  # Loga se o CPF não foi encontrado
+        return JsonResponse({'status': 'nao_existe'})
+
+    except Exception as e:
+        # Trata exceções inesperadas
+        print(f"Erro ao verificar o CPF: {str(e)}")
+        return JsonResponse({'status': 'erro', 'message': 'Erro inesperado. Tente novamente mais tarde.'}, status=500)
+
+# Se alguém tentar acessar a rota por outro método que não seja POST, @require_POST já cuida de retornar um erro 405 (Método Não Permitido).
 #**********************************************************************************************************
 
 def cadastro_usuario(request):
