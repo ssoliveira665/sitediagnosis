@@ -60,6 +60,8 @@ from .forms import InscricaoForm
 
 from django.db import IntegrityError
 
+from django.core.paginator import Paginator
+
 
 
 
@@ -925,16 +927,13 @@ def admin_login_view(request):
     return render(request, 'registration/admin_login.html')
 #**********************************************************************************************************
 def listar_inscricoes(request):
-    inscricoes = Inscricao.objects.all()  # Busque todas as inscrições inicialmente
-    
-    # Se os filtros forem aplicados
-    nome_candidato = request.GET.get('nome_candidato')
-    cpf = request.GET.get('cpf')
+    inscricoes = Inscricao.objects.select_related('candidato').all()
+    nome_candidato = request.GET.get('nome_candidato', '').strip()
+    cpf = request.GET.get('cpf', '').strip()
     status = request.GET.get('status')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
 
-    # Filtros dinâmicos
     if nome_candidato:
         inscricoes = inscricoes.filter(candidato__nome_completo__icontains=nome_candidato)
     if cpf:
@@ -945,14 +944,20 @@ def listar_inscricoes(request):
         inscricoes = inscricoes.filter(data_inscricao__gte=data_inicio)
     if data_fim:
         inscricoes = inscricoes.filter(data_inscricao__lte=data_fim)
-    
-    # Passe o formulário e as inscrições filtradas para o template
+
+    paginator = Paginator(inscricoes, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     form = InscricaoFilterForm(request.GET or None)
+
     context = {
-        'inscricoes': inscricoes,
+        'inscricoes': page_obj,
         'form': form,
+        'paginator': paginator,
+        'page_obj': page_obj,
     }
-    
+
     return render(request, 'inscricoes/listar.html', context)
 #**********************************************************************************************************
 
@@ -1020,4 +1025,34 @@ def pagina_atualizacao(request):
         return render(request, 'atualizacao.html')
     else:
         return redirect('home')  # Redireciona para a página principal quando o site não está em atualização
+#**********************************************************************************************************
+def editar_inscricao(request, inscricao_id):
+    if request.method == 'POST':
+        # Obtendo o objeto de inscrição com base no ID
+        inscricao = get_object_or_404(Inscricao, id=inscricao_id)
+        
+        # Obtendo os dados do formulário
+        inscricao.nota_prova = request.POST.get('nota_prova')
+        inscricao.status = request.POST.get('status')
+        
+        # Atualizando outras informações do candidato se necessário
+        inscricao.responsavel_legal = request.POST.get('responsavel_legal')
+        inscricao.telefone = request.POST.get('telefone')
+        inscricao.endereco = request.POST.get('endereco')
+        inscricao.cidade = request.POST.get('cidade')
+        inscricao.bairro = request.POST.get('bairro')
+        inscricao.tipo_necessidade_especial = request.POST.get('necessidade_especial')
+        inscricao.aprovado = request.POST.get('aprovado')
+        inscricao.local_exame = request.POST.get('local_exame')
+
+        # Salvando a inscrição atualizada
+        inscricao.save()
+
+        # Mensagem de sucesso
+        messages.success(request, 'Inscrição atualizada com sucesso.')
+        
+        return redirect('listar_inscricoes')  # Redireciona para a lista de inscrições
+
+    # Caso não seja uma requisição POST, redirecione para a página de listagem
+    return redirect('listar_inscricoes')
 #**********************************************************************************************************

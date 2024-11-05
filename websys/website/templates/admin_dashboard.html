@@ -302,15 +302,23 @@
                             </a>
                         
                             <a href="#" class="btn btn-warning btn-sm edit-inscricao" 
-                               data-bs-toggle="modal" 
-                               data-bs-target="#editInscricaoModal" 
-                               data-id="{{ inscricao.id }}" 
-                               data-nome="{{ inscricao.candidato.nome_completo }}" 
-                               data-nota="{{ inscricao.nota_prova }}"
-                               data-status="{{ inscricao.status }}"
-                               data-disciplinas="{{ inscricao.disciplinas_aprovadas }}"
-                               data-prova_realizada="{{ inscricao.prova_realizada }}">
-                               <i class="fas fa-edit"></i> Editar
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editInscricaoModal" 
+                            data-id="{{ inscricao.id }}" 
+                            data-nome="{{ inscricao.candidato.nome_completo }}" 
+                            data-cpf="{{ inscricao.candidato.cpf }}" 
+                            data-data="{{ inscricao.data_inscricao|date:'d/m/Y' }}"
+                            data-status="{{ inscricao.status }}" 
+                            data-nota="{{ inscricao.nota_prova }}" 
+                            data-responsavel="{{ inscricao.responsavel_legal }}"
+                            data-telefone="{{ inscricao.telefone }}"
+                            data-endereco="{{ inscricao.endereco }}"
+                            data-cidade="{{ inscricao.cidade }}"
+                            data-bairro="{{ inscricao.bairro }}"
+                            data-necessidade="{{ inscricao.tipo_necessidade_especial }}"
+                            data-aprovado="{{ inscricao.aprovado }}"
+                            data-local="{{ inscricao.local_exame }}">
+                            <i class="fas fa-edit"></i> Editar
                             </a>
                         
                             <a href="#" class="btn btn-danger btn-sm inativar-inscricao" 
@@ -339,7 +347,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>ID:</strong> <span id="inscricao-id"></span></p>
-                            <p><strong>Nome Completo:</strong> <span id="inscricao-nome"></span></p>
+                            <!-- <p><strong>Nome Completo:</strong> <span id="inscricao-nome"></span></p> -->
                             <p><strong>CPF:</strong> <span id="inscricao-cpf"></span></p>
                             <p><strong>Data de Inscrição:</strong> <span id="inscricao-data"></span></p>
                             <p><strong>Responsável Legal:</strong> <span id="responsavel-legal"></span></p>
@@ -391,7 +399,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editInscricaoModalLabel">Editar Resultado: <span id="edit-inscricao-nome"></span></h5>
+                <h5 class="modal-title" id="editInscricaoModalLabel">Editar Resultado</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editInscricaoForm" method="POST" action="">
@@ -400,7 +408,47 @@
                     <input type="hidden" id="edit-inscricao-id" name="inscricao_id">
                     
                     <div class="row">
-                        <!-- Campos para editar a nota da prova e status -->
+                        <!-- Dados básicos do candidato -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit-inscricao-nome" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="edit-inscricao-nome" name="nome" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-cpf" class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="edit-inscricao-cpf" name="cpf" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-telefone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="edit-inscricao-telefone" name="telefone" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-endereco" class="form-label">Endereço</label>
+                                <input type="text" class="form-control" id="edit-inscricao-endereco" name="endereco" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Outros dados do candidato -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit-inscricao-cidade" class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="edit-inscricao-cidade" name="cidade" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-bairro" class="form-label">Bairro</label>
+                                <input type="text" class="form-control" id="edit-inscricao-bairro" name="bairro" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-responsavel" class="form-label">Responsável Legal</label>
+                                <input type="text" class="form-control" id="edit-inscricao-responsavel" name="responsavel" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-inscricao-necessidade" class="form-label">Necessidade Especial</label>
+                                <input type="text" class="form-control" id="edit-inscricao-necessidade" name="necessidade" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Campos para editar a nota da prova, status e disciplinas -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="nota-prova" class="form-label">Nota da Prova</label>
@@ -415,8 +463,8 @@
                                 </select>
                             </div>
                         </div>
-            
-                        <!-- Campos para editar disciplinas e prova realizada -->
+
+                        <!-- Disciplinas e prova realizada -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="disciplinas">Disciplinas Aprovadas:</label>
@@ -431,13 +479,12 @@
                                     <option value="Inglês">Inglês</option>
                                 </select>
                             </div>
-            
-                            <!-- Botões para selecionar ou desmarcar todas as disciplinas -->
+
                             <div class="form-group mt-2">
                                 <button type="button" class="btn btn-primary" id="select-all-disciplines">Selecionar Todas</button>
                                 <button type="button" class="btn btn-secondary" id="deselect-all-disciplines">Desmarcar Todas</button>
                             </div>
-            
+
                             <div class="form-check mt-3">
                                 <input class="form-check-input" type="checkbox" id="prova-realizada" name="prova_realizada">
                                 <label class="form-check-label" for="prova-realizada">
@@ -447,19 +494,17 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                 </div>
             </form>
-            
-
-
         </div>
     </div>
 </div>
-<!-- Modal -->
+
+
     
 
 <!-- DataTables and Bootstrap Scripts -->
@@ -598,11 +643,6 @@
     });
 </script>
 
-    
-    
-    
-    
-    
 
     <!-- Script para gerar o gráfico -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -668,55 +708,53 @@
 
 <script>
    $(document).ready(function() {
-    // Ao abrir a modal de edição, preencha os campos com os dados do item a ser editado
     $('.edit-inscricao').on('click', function() {
         var id = $(this).data('id');
         var nome = $(this).data('nome');
+        var cpf = $(this).data('cpf');
+        var telefone = $(this).data('telefone');
+        var endereco = $(this).data('endereco');
+        var cidade = $(this).data('cidade');
+        var bairro = $(this).data('bairro');
+        var responsavel = $(this).data('responsavel');
+        var necessidade = $(this).data('necessidade');
         var status = $(this).data('status');
         var nota = $(this).data('nota');
+        var disciplinas = $(this).data('disciplinas');
+        var provaRealizada = $(this).data('prova_realizada');
 
         $('#edit-inscricao-id').val(id);
-        $('#edit-inscricao-nome').text(nome);
-        $('#edit-inscricao-status').val(status);
-        $('#edit-inscricao-nota').val(nota);
+        $('#edit-inscricao-nome').val(nome);
+        $('#edit-inscricao-cpf').val(cpf);
+        $('#edit-inscricao-telefone').val(telefone);
+        $('#edit-inscricao-endereco').val(endereco);
+        $('#edit-inscricao-cidade').val(cidade);
+        $('#edit-inscricao-bairro').val(bairro);
+        $('#edit-inscricao-responsavel').val(responsavel);
+        $('#edit-inscricao-necessidade').val(necessidade);
+        $('#status').val(status);
+        $('#nota-prova').val(nota);
+        $('#prova-realizada').prop('checked', provaRealizada);
+
+        $('#edit-inscricao-disciplinas option').prop('selected', false);
+        if (disciplinas) {
+            disciplinas.forEach(function(disciplina) {
+                $('#edit-inscricao-disciplinas option[value="' + disciplina + '"]').prop('selected', true);
+            });
+        }
+    });
+    
+    $('#select-all-disciplines').on('click', function() {
+        $('#edit-inscricao-disciplinas option').prop('selected', true);
+        $('#edit-inscricao-disciplinas').trigger('change');
     });
 
-    // Envio do formulário via AJAX
-    $('#editInscricaoForm').on('submit', function(event) {
-        event.preventDefault();  // Impede o envio normal do formulário
-
-        var inscricaoId = $('#edit-inscricao-id').val();
-        var formData = $(this).serialize();  // Coleta todos os dados do formulário
-
-        $.ajax({
-            url: '/editar-inscricao/' + inscricaoId + '/',
-            method: 'POST',
-            data: formData,
-            success: function(response) {
-                // Fechar a modal após a atualização bem-sucedida
-                $('#editInscricaoModal').modal('hide');
-
-                // Exibir mensagem de sucesso (usando SweetAlert, por exemplo)
-                Swal.fire({
-                    title: 'Sucesso!',
-                    text: 'Inscrição atualizada com sucesso!',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-
-                // Atualizar a tabela ou realizar qualquer outra ação necessária
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({
-                    title: 'Erro!',
-                    text: 'Ocorreu um erro ao atualizar a inscrição.',
-                    icon: 'error',
-                    confirmButtonText: 'Tentar novamente'
-                });
-            }
-        });
+    $('#deselect-all-disciplines').on('click', function() {
+        $('#edit-inscricao-disciplinas option').prop('selected', false);
+        $('#edit-inscricao-disciplinas').trigger('change');
     });
 });
+
 
 
 

@@ -76,4 +76,6 @@ urlpatterns = [
     path('inativar-inscricao/<int:id>/', views.inativar_inscricao, name='inativar_inscricao'),
     path('atualizacao/', views.pagina_atualizacao, name='pagina_atualizacao'),
 
+    path('editar-inscricao/<int:inscricao_id>/', views.editar_inscricao, name='editar_inscricao'),
+
 ]
