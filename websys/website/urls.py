@@ -78,4 +78,12 @@ urlpatterns = [
 
     path('editar-inscricao/<int:inscricao_id>/', views.editar_inscricao, name='editar_inscricao'),
 
+    path('ajuda/', views.ajuda_view, name='ajuda_suporte'),
+    path('ajuda/', views.ajuda_view, name='ajuda'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin-dashboard'),
+
+    path('configuracoes/alterar-senha/', views.alterar_senha, name='alterar_senha'),
+    path('configuracoes/atualizar-notificacoes/', views.atualizar_notificacoes, name='atualizar_notificacoes'),
+    path('seguranca/', views.seguranca, name='seguranca'),
+
 ]

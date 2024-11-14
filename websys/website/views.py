@@ -62,6 +62,9 @@ from django.db import IntegrityError
 
 from django.core.paginator import Paginator
 
+from django.contrib.auth import update_session_auth_hash
+from django import forms
+
 
 
 
@@ -1055,4 +1058,60 @@ def editar_inscricao(request, inscricao_id):
 
     # Caso não seja uma requisição POST, redirecione para a página de listagem
     return redirect('listar_inscricoes')
+#**********************************************************************************************************
+def ajuda_view(request):
+    return render(request, 'ajuda.html')
+#**********************************************************************************************************
+# Formulário para a alteração de senha
+class AlterarSenhaForm(forms.Form):
+    current_password = forms.CharField(widget=forms.PasswordInput, label="Senha Atual")
+    new_password = forms.CharField(widget=forms.PasswordInput, label="Nova Senha")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirmar Nova Senha")
+
+
+@login_required
+def alterar_senha(request):
+    if request.method == 'POST':
+        form = AlterarSenhaForm(request.POST)
+        if form.is_valid():
+            current_password = form.cleaned_data['current_password']
+            new_password = form.cleaned_data['new_password']
+            confirm_password = form.cleaned_data['confirm_password']
+
+            # Verifica a senha atual
+            if not request.user.check_password(current_password):
+                messages.error(request, 'Senha atual incorreta.')
+            elif new_password != confirm_password:
+                messages.error(request, 'A nova senha e a confirmação não coincidem.')
+            else:
+                request.user.set_password(new_password)
+                request.user.save()
+                update_session_auth_hash(request, request.user)  # Mantém o usuário logado após a alteração
+                messages.success(request, 'Senha alterada com sucesso.')
+                return redirect('alterar_senha')
+    else:
+        form = AlterarSenhaForm()
+
+    return render(request, 'configuracoes/alterar_senha.html', {'form': form})
+#**********************************************************************************************************
+
+@login_required
+def atualizar_notificacoes(request):
+    if request.method == 'POST':
+        notificacao_email = 'notificacao_email' in request.POST
+        notificacao_sms = 'notificacao_sms' in request.POST
+
+        # Supondo que notificacao_email e notificacao_sms são campos booleanos no modelo de User ou UserProfile
+        user_profile = request.user.userprofile  # Use um perfil de usuário se existir
+        user_profile.notificacao_email = notificacao_email
+        user_profile.notificacao_sms = notificacao_sms
+        user_profile.save()
+
+        messages.success(request, 'Preferências de notificação atualizadas com sucesso.')
+        return redirect('atualizar_notificacoes')
+
+    return render(request, 'configuracoes/preferencias_notificacoes.html')
+#**********************************************************************************************************
+def seguranca(request):
+    return render(request, 'seguranca.html')
 #**********************************************************************************************************
